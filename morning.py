@@ -19,7 +19,10 @@ load_dotenv()
 # Values from envirionment
 username = os.getenv("LOGIN_USER")
 password = os.getenv("LOGIN_PASSWORD")
-selenium_url = os.getenv("SELENIUM_URL")
+selenium_url = os.getenv("SELENIUM_URL", "http://selenium:4444/wd/hub")
+redis_host =os.getenv("REDIS_HOST", "redis")
+redis_port =os.getenv("REDIS_PORT", 6379)
+redis_db =os.getenv("REDIS_DB", 0)
 cache_time=os.getenv("CACHE_TIME", 600)
 
 login_page = 'https://abbonati.ilpost.it/mio-account/?redirect=https://www.ilpost.it'
@@ -30,7 +33,7 @@ accept_button_xpath='//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]'
 login_xpath = '//*[@id="customer_login"]/div/form/p[3]/button'
 morning_today_xpath = '//audio[@id="ilpostPlayerAudio"]'
 
-r = redis.Redis(host='trenzalore.asgard.lan', port=6379, db=0)
+r = redis.Redis(host=redis_host, port=redis_port, db=0)
 
 def get_cookies_redis():
   try:
