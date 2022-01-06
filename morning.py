@@ -6,6 +6,7 @@ import os
 import pickle
 import json
 import requests
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -26,18 +27,19 @@ cache_time=os.getenv("CACHE_TIME", 3600)
 
 # Used Variables
 selenium_hub = selenium_url + "/wd/hub"
-login_page = 'https://abbonati.ilpost.it/mio-account/?redirect=https://www.ilpost.it'
+login_page = 'https://www.ilpost.it/wp-login.php?redirect_to=https://www.ilpost.it'
 morning_page = 'https://www.ilpost.it/podcasts/morning/'
-username_xpath="//input[@id='username']"
-password_xpath="//input[@id='password']"
+username_xpath="//input[@id='user_login']"
+password_xpath="//input[@id='user_pass']"
+checkbox_xpath="//input[@id='rememberme']"
 accept_button_xpath='//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]'
-login_xpath = '//*[@id="customer_login"]/div/form/p[3]/button'
+login_xpath = '//input[@id="wp-submit"]'
 morning_today_xpath = '//audio[@id="ilpostPlayerAudio"]'
 
 # Init Objects
 r = redis.Redis(host=redis_host, port=redis_port, db=redis_db)
 app = Flask(__name__)
-
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 def get_cookies_redis():
   try:
     pickled_cookies=r.get('cookies')
@@ -77,6 +79,8 @@ def create_cookies():
     elem.send_keys(username)
     elem = driver.find_element(By.XPATH, password_xpath)
     elem.send_keys(password)
+    elem = driver.find_element(By.XPATH, checkbox_xpath)
+    elem.click()
     try:
       print("Login")
       elem = driver.find_element(By.XPATH, login_xpath)
