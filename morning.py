@@ -71,9 +71,9 @@ def create_cookies():
   print("Creating New Cookies!")
   with driver:
     driver.get(login_page)
-    print("Accept Cookie thing")
-    elem = driver.find_element(By.XPATH, accept_button_xpath)
-    elem.click()
+    # print("Accept Cookie thing")
+    # elem = driver.find_element(By.XPATH, accept_button_xpath)
+    # elem.click()
     print ("Fill Credentials")
     elem = driver.find_element(By.XPATH, username_xpath)
     elem.send_keys(username)
