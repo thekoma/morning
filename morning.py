@@ -32,7 +32,7 @@ morning_page = 'https://www.ilpost.it/podcasts/morning/'
 username_xpath="//input[@id='user_login']"
 password_xpath="//input[@id='user_pass']"
 checkbox_xpath="//input[@id='rememberme']"
-accept_button_xpath='//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]'
+# accept_button_xpath='//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]'
 login_xpath = '//input[@id="wp-submit"]'
 morning_today_xpath = '//audio[@id="ilpostPlayerAudio"]'
 
@@ -134,12 +134,21 @@ def get_cookies():
 @app.route("/morning")
 def get_morning_url():
   force = request.args.get('force')
-  print(force)
+  fresh = request.args.get('fresh')
+  newcookies = request.args.get('newcookies')
+  if force !=  None:
+    newcookies = True
+    fresh = True
+
+  if newcookies !=  None:
+    print("---> Forcing new Cookies")
+    create_cookies()
+
   checks=do_checks()
   if checks[0]:
     now=time.time()
     last_scrape = 0 if r.get('last_scrape') is None else pickle.loads(r.get('last_scrape'))
-    if ((now - last_scrape) > cache_time) or force !=  None:
+    if ((now - last_scrape) > cache_time) or fresh !=  None:
       update_morning_url()
       last_scrape=pickle.loads(r.get('last_scrape'))
       
