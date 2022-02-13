@@ -47,7 +47,7 @@ jobs:
         run: |
           docker info
           docker buildx version
-          .github/bin/docker-release.sh
+          .github/bin/docker-build.sh
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
           DOCKER_BUILD_PLATFORM: linux/amd64,linux/arm64,linux/arm/v7
