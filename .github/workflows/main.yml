@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: checkout source repo
         uses: actions/checkout@v2
+      - name: Install libraries!
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
       - name: linting
         uses: alexanderdamiani/pylinter@v1.4.0
         with:
@@ -31,7 +35,6 @@ jobs:
           flake8-flags: '--count --show-source --statistics'
           mypy-flags: '--ignore-missing-imports'
           fail-on-isort: true
-          mypy-ignore-dirs-files: 'folder1 folder2/main.py'
 
   build:
     needs:
