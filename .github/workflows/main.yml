@@ -77,25 +77,25 @@ jobs:
           if_true: ''
           if_false: 'type=registry,ref=ghcr.io/${{ github.repository }}:buildcache'
 
-      - name: Build and push (tag)
+      - name: Build the image (but don't push it yet)
         uses: docker/build-push-action@v2
         with:
           context: .
           tags: "${{ env.TEST_IMAGE }}"
           load: true
           cache-from: ${{ steps.bump.outputs.value }}
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+          # cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
 
-      - name: Test
+      - name: Test the image
         run: |
           echo "test test! gne gne gne!"
 
-      - name: Build and push (tag)
+      - name: Push the image!
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
           tags: "${{ steps.ismain.outputs.value }}ghcr.io/${{ github.repository }}:${{ github.ref_name }}"
-          cache-from: ${{ steps.bump.outputs.value }}
+          # cache-from: ${{ steps.bump.outputs.value }}
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm64,linux/arm/v7
