@@ -53,6 +53,8 @@ jobs:
           config: .github/config/buildkitd.toml
           install: true
 
+
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -64,9 +66,18 @@ jobs:
         uses: haya14busa/action-cond@v1
         id: ismain
         with:
-          cond: ${{ contains(github.ref_name, 'main') }}
+          cond: ${{ github.ref_name == 'main' }}
+          # cond: ${{ contains(github.ref_name, 'main') }}
           if_true: 'ghcr.io/${{ github.repository }}:latest,'  # string value
           if_false: '' # string value
+
+      - name: Ignore cache if bumping
+        uses: haya14busa/action-cond@v1
+        id: bump
+        with:
+          cond: ${{ contains(github.event.head_commit.message, 'bump') }}
+          if_true: ''  # string value
+          if_false: 'type=registry,ref=ghcr.io/${{ github.repository }}:buildcache' # string value
 
       - name: Build and push (tag)
         uses: docker/build-push-action@v2
@@ -74,6 +85,6 @@ jobs:
           context: .
           push: true
           tags: "${{ steps.ismain.outputs.value }}ghcr.io/${{ github.repository }}:${{ github.ref_name }}"
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-from: ${{ steps.bump.outputs.value }}
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm64,linux/arm/v7
