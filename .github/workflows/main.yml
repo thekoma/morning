@@ -34,7 +34,7 @@ jobs:
         with:
           python-root: './src/'
           flake8-flags: '--count --show-source --statistics'
-          mypy-flags: '--non-interactive --install-types'
+          mypy-flags: '--ignore-missing-imports --non-interactive --install-types'
           fail-on-isort: true
 
   build:
