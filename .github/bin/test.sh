@@ -1,11 +1,11 @@
 #!/bin/bash
 if ! type -p executable_name &>/dev/null; then
-    apt-get update; apt-get install -y jq
+  sudo apt-get update; sudo apt-get install -y jq
 fi
 docker-compose -f docker-compose.yml up -d
 try=0
 while [ $try -lt 12 ]; do
-  health=$(docker inspect "$(docker-compose ps -q morning)" |jq '.[0] | .State.Health.Status'|sed's/"//g')
+  health=$(docker inspect "$(docker-compose ps -q morning)" |jq '.[0] | .State.Health.Status'|sed 's/"//g')
   if [ "${health}" == "healthy" ]; then
     echo "Morning is healthy! Great Job!"
     exit_var=0
