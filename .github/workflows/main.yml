@@ -8,7 +8,8 @@ on:
       - main
       - "fix-*"
       - "feature-"
-
+env:
+  TEST_IMAGE: "ghcr.io/${{ github.repository }}:${{ github.ref_name }}-test"
 jobs:
   cancel-previous-runs:
     name: Cancel previous runs
@@ -75,6 +76,19 @@ jobs:
           cond: ${{ contains(github.event.head_commit.message, 'bump') }}
           if_true: ''
           if_false: 'type=registry,ref=ghcr.io/${{ github.repository }}:buildcache'
+
+      - name: Build and push (tag)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          tags: "${{ env.TEST_IMAGE }}"
+          load: true
+          cache-from: ${{ steps.bump.outputs.value }}
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+
+      - name: Test
+        run: |
+          echo "test test! gne gne gne!"
 
       - name: Build and push (tag)
         uses: docker/build-push-action@v2
