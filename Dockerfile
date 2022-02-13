@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 ENV CRYPTOGRAPHY_DONT_BUILD_CARGO=1
 COPY requirements.txt ./
-RUN --security=insecure \
+RUN \
   mkdir -p /root/.cargo && \
   chmod 777 /root/.cargo && \
   mount -t tmpfs none /root/.cargo && \
