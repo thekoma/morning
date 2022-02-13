@@ -1,0 +1,57 @@
+version: "3"
+networks:
+  web:
+    external: true
+services:
+  morning:
+    image: ${TEST_IMAGE}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 60
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - LOGIN_USER=fake
+      - LOGIN_PASSWORD=password
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+      - selenium
+  redis:
+    restart: always
+    image: "redis:alpine"
+    ports:
+      - '6379:6379'
+    expose:
+      - '6379'
+    volumes:
+      - redis-data:/var/lib/redis
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  selenium:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    shm_size: '2gb'
+    image: selenium/standalone-chrome
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - SE_NODE_MAX_SESSIONS=100
+      - VNC_NO_PASSWORD=1
+    restart: always
+    ports:
+      - "4444:4444"
+    expose:
+      - '4444'

@@ -54,6 +54,11 @@ jobs:
           config: .github/config/buildkitd.toml
           install: true
 
+      - name: Setup docker-compose
+        uses: KengoTODA/actions-setup-docker-compose@main
+        with:
+          version: '1.29.2'
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -87,7 +92,7 @@ jobs:
 
       - name: Test the image
         run: |
-          echo "test test! gne gne gne!"
+          bin/test.sh
 
       - name: Push the image!
         uses: docker/build-push-action@v2
