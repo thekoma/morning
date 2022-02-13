@@ -40,12 +40,6 @@ jobs:
       - python-lint
     runs-on: ubuntu-latest
     steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}dc log
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Do Checkout
         uses: actions/checkout@v2
@@ -59,12 +53,30 @@ jobs:
           config: .github/config/buildkitd.toml
           install: true
 
-      - name: Docker Build
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: "ghcr.io/${{ github.repository }}:latest,ghcr.io/${{ github.repository }}:${{ github.tag }},ghcr.io/${{ github.repository }}:${{ github.branch }}"
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+      - name: Move cache
         run: |
-          docker info
-          docker buildx version
-          .github/bin/docker-build.sh
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
-          DOCKER_BUILD_PLATFORM: linux/amd64,linux/arm64,linux/arm/v7
-          REPOSITORY: ${{ github.repository }}
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      # - name: Docker Build
+      #   run: |
+      #     .github/bin/docker-push.sh
+      #   env:
+      #     DOCKER_CLI_EXPERIMENTAL: enabled
+      #     DOCKER_BUILD_PLATFORM: linux/amd64,linux/arm64,linux/arm/v7
+      #     REPOSITORY: ${{ github.repository }}
