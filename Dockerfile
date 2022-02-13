@@ -1,5 +1,5 @@
 FROM python:3-alpine
-RUN apk add --no-cache build-base curl libffi-dev libxml2-dev libxslt-dev
+RUN apk add --no-cache build-base curl libffi-dev libxml2-dev libxslt-dev openssl-dev
 WORKDIR /usr/src/app
 COPY requirements.txt ./
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
