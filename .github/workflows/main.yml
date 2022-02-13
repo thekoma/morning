@@ -60,23 +60,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Determine Checkout Depth
+        uses: haya14busa/action-cond@v1
+        id: fetchDepth
+        with:
+          cond: ${{ "contains(github.ref_type, 'main')" }}
+          if_true: 'ghcr.io/${{ github.repository }}:latest,'  # string value
+          if_false: '' # string value
+
+      - name: Build and push (tag)
         uses: docker/build-push-action@v2
+        if: "contains(github.ref_type, 'main')"
         with:
           context: .
           push: true
-          tags: "ghcr.io/${{ github.repository }}:latest,ghcr.io/${{ github.repository }}:${{ github.tag }},ghcr.io/${{ github.repository }}:${{ github.branch }}"
+          tags: "${{ steps.condval.outputs.value }}ghcr.io/${{ github.repository }}:${{ github.ref_name }}"
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm64,linux/arm/v7
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-      # - name: Docker Build
-      #   run: |
-      #     .github/bin/docker-push.sh
-      #   env:
-      #     DOCKER_CLI_EXPERIMENTAL: enabled
-      #     DOCKER_BUILD_PLATFORM: linux/amd64,linux/arm64,linux/arm/v7
-      #     REPOSITORY: ${{ github.repository }}
