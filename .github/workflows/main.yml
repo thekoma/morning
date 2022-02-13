@@ -64,13 +64,12 @@ jobs:
         uses: haya14busa/action-cond@v1
         id: condval
         with:
-          cond: ${{ "contains(github.ref_type, 'main')" }}
+          cond: ${{ contains(github.ref_type, 'main') }}
           if_true: 'ghcr.io/${{ github.repository }}:latest,'  # string value
           if_false: '' # string value
 
       - name: Build and push (tag)
         uses: docker/build-push-action@v2
-        if: "contains(github.ref_type, 'main')"
         with:
           context: .
           push: true
