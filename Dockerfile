@@ -1,5 +1,5 @@
 FROM python:3-alpine
-RUN apk add --no-cache build-base curl libffi-dev libxml2-dev libxslt-dev rust
+RUN apk add --no-cache build-base curl libffi-dev libxml2-dev libxslt-dev rust cargo
 WORKDIR /usr/src/app
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 ENV CRYPTOGRAPHY_DONT_BUILD_CARGO=1
