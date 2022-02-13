@@ -1,7 +1,7 @@
 FROM python:3-alpine
-RUN apk add --no-cache build-base curl libffi-dev libxml2-dev libxslt-dev
+RUN apk add --no-cache build-base curl libffi-dev libxml2-dev libxslt-dev rust
 WORKDIR /usr/src/app
-
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
