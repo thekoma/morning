@@ -7,18 +7,17 @@ exit_var=1
 sleep=5
 echo "🚦 Starting checks."
 while [ $try -lt $retry ]; do
+  ((try++))
   health=$(docker inspect "$(docker-compose ps -q morning)" |jq '.[0] | .State.Health.Status'|sed 's/"//g')
   echo "🔍 Checking...[${try}/${retry}]"
   if [ "${health}" == "healthy" ]; then
     exit_var=0
     break
   else
-    ((try++))
     docker-compose ps
     docker-compose logs morning
     echo "⏳ Not ready. Sleeping $sleep seconds. "
     sleep $sleep
-
   fi
 done
 
