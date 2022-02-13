@@ -4,10 +4,9 @@ on:
   push:
     # tags:
     #   - "v*"
-    # comment?
+
     branches:
-      - master
-      - next
+      - main
 
 jobs:
   cancel-previous-runs:
