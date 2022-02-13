@@ -6,7 +6,7 @@ ENV CRYPTOGRAPHY_DONT_BUILD_CARGO=1
 COPY requirements.txt ./
 RUN mkdir -p /root/.cargo
 RUN chmod 777 /root/.cargo
-RUN mount -t tmpfs none /root/.cargo
+# RUN mount -t tmpfs none /root/.cargo
 RUN pip3 install --no-cache-dir --upgrade pip
 RUN pip3 install --no-cache-dir -r requirements.txt
 COPY . .
