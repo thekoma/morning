@@ -11,8 +11,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
