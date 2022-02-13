@@ -62,7 +62,7 @@ jobs:
 
       - name: Determine Checkout Depth
         uses: haya14busa/action-cond@v1
-        id: fetchDepth
+        id: condval
         with:
           cond: ${{ "contains(github.ref_type, 'main')" }}
           if_true: 'ghcr.io/${{ github.repository }}:latest,'  # string value
