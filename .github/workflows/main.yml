@@ -11,6 +11,7 @@ on:
 
 jobs:
   cancel-previous-runs:
+    name: Cancel previous runs
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
@@ -20,15 +21,11 @@ jobs:
 
   python-lint:
     runs-on: ubuntu-latest
-    name: CI workflow
+    name: Check Code quality
     steps:
       - name: checkout source repo
         uses: actions/checkout@v2
-      # - name: Install libraries!
-      #   run: |
-      #     pip install --upgrade pip
-      #     pip install types-redis types-requests
-      #     pip install -r requirements.txt
+
       - name: linting
         uses: alexanderdamiani/pylinter@v1.4.0
         with:
@@ -38,6 +35,7 @@ jobs:
           fail-on-isort: true
 
   build:
+    name: Build the containers
     needs:
       - python-lint
     runs-on: ubuntu-latest
