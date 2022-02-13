@@ -1,10 +1,12 @@
 #!/bin/bash
-
-docker-compose -f docker-compose.yml up -d
 try=0
 retry=12
 exit_var=1
 sleep=5
+
+echo 🐳 Setting up docker composer
+docker-compose -f docker-compose.yml up -d
+
 echo "🚦 Starting checks."
 while [ $try -lt $retry ]; do
   ((try++))
