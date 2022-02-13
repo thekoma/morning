@@ -34,11 +34,6 @@ jobs:
       - name: Do Checkout
         uses: actions/checkout@v2
       - name: Docker Build
-        # with:
-        #   registry: ghcr.io
-        #   username: ${{ github.actor }}
-        #   password: ${{ secrets.GITHUB_TOKEN }}
-        #   repository: ${{ github.repository }}
         run: |
           export ARCH=$([ $(uname -m) = "x86_64" ] && echo "amd64" || echo "arm64")
           mkdir -p ~/.docker/cli-plugins/
@@ -51,7 +46,6 @@ jobs:
           docker buildx inspect --bootstrap
           chmod +x .github/bin/docker-release.sh
           .github/bin/docker-release.sh
-
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
           DOCKER_BUILD_PLATFORM: linux/amd64,linux/arm64,linux/arm/v7

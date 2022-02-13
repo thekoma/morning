@@ -4,7 +4,12 @@ WORKDIR /usr/src/app
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 ENV CRYPTOGRAPHY_DONT_BUILD_CARGO=1
 COPY requirements.txt ./
-RUN pip install --upgrade pip; pip install --no-cache-dir -r requirements.txt
+RUN --security=insecure \
+  mkdir -p /root/.cargo && \
+  chmod 777 /root/.cargo && \
+  mount -t tmpfs none /root/.cargo && \
+  pip3 install --no-cache-dir --upgrade pip && \
+  pip3 install --no-cache-dir -r requirements.txt
 COPY . .
 ENV FLASK_APP=morning
 ENV PYTHONUNBUFFERED=TRUE
