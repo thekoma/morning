@@ -6,6 +6,8 @@ on:
       - "v*"
     branches:
       - main
+      - "fix-*"
+      - "feature-"
 
 jobs:
   cancel-previous-runs:
@@ -28,7 +30,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ github.actor }}dc log
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Do Checkout
