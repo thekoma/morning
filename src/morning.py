@@ -10,8 +10,8 @@ import requests
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.common.by import By
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
@@ -57,7 +57,7 @@ def get_cookies_redis():
                         f"[🔴] {cookie.get('name')} - \
                         Expired: {time.ctime(cookie.get('expiry'))}"
                     )
-                    cookies=None
+                    cookies = None
                 else:
                     print(
                         f"[🟠] {cookie.get('name')} - \
@@ -108,11 +108,10 @@ def is_selenium_available():
     response = requests.get(SELENIUM_URL + "/ui/index.html")
     status = response.status_code
     if status != 200:
-        accessible=False
+        accessible = False
     else:
-        accessible=True
+        accessible = True
     return accessible, status
-
 
 
 def is_redis_available():
@@ -180,7 +179,7 @@ def get_morning_url():
         )
         morning = "Null" if r.get("morning") is None else pickle.loads(r.get("morning"))
 
-        response=jsonify(
+        response = jsonify(
             morning=morning,
             old_morning=old_morning,
             last_scrape=last_scrape,
