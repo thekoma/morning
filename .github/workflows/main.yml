@@ -60,9 +60,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Determine Checkout Depth
+      - name: Add latest tag if main branch
         uses: haya14busa/action-cond@v1
-        id: condval
+        id: ismain
         with:
           cond: ${{ contains(github.ref_name, 'main') }}
           if_true: 'ghcr.io/${{ github.repository }}:latest,'  # string value
@@ -73,7 +73,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: "${{ steps.condval.outputs.value }}ghcr.io/${{ github.repository }}:${{ github.ref_name }}"
+          tags: "${{ steps.ismain.outputs.value }}ghcr.io/${{ github.repository }}:${{ github.ref_name }}"
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm64,linux/arm/v7
