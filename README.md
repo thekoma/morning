@@ -1,3 +1,5 @@
+[![CI](https://github.com/thekoma/morning/actions/workflows/main.yml/badge.svg)](https://github.com/thekoma/morning/actions/workflows/main.yml)
+
 TODO:
 - Check variables at boot
 - Check Redis connection

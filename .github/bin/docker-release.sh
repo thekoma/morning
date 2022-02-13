@@ -6,12 +6,12 @@ else
 fi
 
 if [[ -n "${GIT_TAG}" ]]; then
-  docker buildx build --progress plain --pull --push --platform "${DOCKER_BUILD_PLATFORM}" -t ${REPOSITORY}:${GIT_TAG} .
+  docker buildx build --progress plain --pull --push --platform "${DOCKER_BUILD_PLATFORM}" -t ghcr.io/${REPOSITORY}:${GIT_TAG} .
 elif [[ -n "${GIT_BRANCH}" ]]; then
   if [[ "${GIT_BRANCH}" == "master" ]]; then
-    docker buildx build --progress plain --pull --push --platform "${DOCKER_BUILD_PLATFORM}" -t ${REPOSITORY}:latest .
+    docker buildx build --progress plain --pull --push --platform "${DOCKER_BUILD_PLATFORM}" -t ghcr.io/${REPOSITORY}:latest .
   else
-    docker buildx build --progress plain --pull --push --platform "${DOCKER_BUILD_PLATFORM}" -t ${REPOSITORY}:${GIT_BRANCH} .
+    docker buildx build --progress plain --pull --push --platform "${DOCKER_BUILD_PLATFORM}" -t ghcr.io/${REPOSITORY}:${GIT_BRANCH} .
   fi
 else
   :
