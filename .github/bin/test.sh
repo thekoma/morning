@@ -1,7 +1,4 @@
 #!/bin/bash
-if ! type -p executable_name &>/dev/null; then
-  sudo apt-get update; sudo apt-get install -y jq
-fi
 docker-compose -f docker-compose.yml up -d
 try=0
 while [ $try -lt 12 ]; do
