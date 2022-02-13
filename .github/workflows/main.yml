@@ -92,7 +92,7 @@ jobs:
 
       - name: Test the image
         run: |
-          bin/test.sh
+          .github/bin/test.sh
 
       - name: Push the image!
         uses: docker/build-push-action@v2
