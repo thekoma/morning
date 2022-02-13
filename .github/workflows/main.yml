@@ -20,30 +20,21 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-  python-lint:
+  build:
+    name: Build the containers
     runs-on: ubuntu-latest
-    name: Check Code quality
     steps:
-      - name: checkout source repo
+
+      - name: Do Checkout
         uses: actions/checkout@v2
 
-      - name: linting
+      - name: Check Code quality
         uses: alexanderdamiani/pylinter@v1.4.0
         with:
           python-root: "./src/"
           flake8-flags: "--count --show-source --statistics --max-line-length=160"
           mypy-flags: "--ignore-missing-imports --non-interactive --install-types"
           fail-on-isort: true
-
-  build:
-    name: Build the containers
-    needs:
-      - python-lint
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Do Checkout
-        uses: actions/checkout@v2
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
