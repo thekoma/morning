@@ -2,9 +2,8 @@ name: CI
 
 on:
   push:
-    # tags:
-    #   - "v*"
-
+    tags:
+      - "v*"
     branches:
       - main
 
@@ -43,6 +42,7 @@ jobs:
         with:
           config: .github/config/buildkitd.toml
           install: true
+
       - name: Docker Build
         run: |
           docker info
