@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check Code quality
-        uses: alexanderdamiani/pylinter@v1.4.0
+        uses: alexanderdamiani/pylinter@v1.4.2
         with:
           python-root: "./src/"
           flake8-flags: "--count --show-source --statistics --max-line-length=160"
