@@ -26,7 +26,7 @@ jobs:
     steps:
 
       - name: Do Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Check Code quality
         uses: alexanderdamiani/pylinter@v1.4.2
