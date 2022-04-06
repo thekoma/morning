@@ -46,7 +46,11 @@ def get_cookies_redis():
     """Return false if redis has no cookies.
     Otherwise return cookies."""
     pickled_cookies = r.get("cookies")
-    cookies = pickle.loads(pickled_cookies)
+    print("DEBUG")
+    try:
+        cookies = pickle.loads(pickled_cookies)
+    except  (TypeError):
+        cookies = create_cookies()
     now = time.time()
     print(f"Found {len(cookies)} cookies in redis!")
     for cookie in cookies:

@@ -1,5 +1,4 @@
 ---
-name: Morning Example
 services:
   morning:
     build: .
