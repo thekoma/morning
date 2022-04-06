@@ -1,20 +1,19 @@
 version: "3"
 services:
   morning:
-    image: ${TEST_IMAGE}
+    build: .
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
       interval: 5s
       timeout: 5s
       retries: 12
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
-      - LOGIN_USER=fake
-      - LOGIN_PASSWORD=password
+    env_file:
+      - .env
     restart: always
     expose:
       - '5000'
+    ports:
+      - 5000:5000
     depends_on:
       - redis
       - selenium
@@ -25,8 +24,8 @@ services:
       - '6379'
     volumes:
       - redis-data:/var/lib/redis
-    environment:
-      - REDIS_REPLICATION_MODE=master
+    env_file:
+      - .env
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli", "ping" ]
       interval: 5s
@@ -40,11 +39,8 @@ services:
       retries: 12
     shm_size: '2gb'
     image: selenium/standalone-chrome
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
-      - SE_NODE_MAX_SESSIONS=100
-      - VNC_NO_PASSWORD=1
+    env_file:
+      - .env
     restart: always
     expose:
       - '4444'
