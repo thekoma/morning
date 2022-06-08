@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """This stupid webapp catches the latest morning post from ilpost.it ."""
-import json
+import orjson, json
 import os
 import pickle
 import time
@@ -8,11 +8,12 @@ import time
 import redis
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from typing import Union
+from fastapi import FastAPI, status, Response
+from fastapi.responses import PlainTextResponse, ORJSONResponse, HTMLResponse
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
-from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
@@ -37,10 +38,8 @@ LOGIN_XPATH = '//input[@id="wp-submit"]'
 MORNING_TODAY_XPATH = '//audio[@id="ilpostPlayerAudio"]'
 
 # Init Objects
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
-app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
-
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, socket_timeout=1)
+app = FastAPI()
 
 def get_cookies_redis():
     """Return false if redis has no cookies.
@@ -49,7 +48,7 @@ def get_cookies_redis():
     print("DEBUG")
     try:
         cookies = pickle.loads(pickled_cookies)
-    except  (TypeError):
+    except (TypeError):
         cookies = create_cookies()
     now = time.time()
     print(f"Found {len(cookies)} cookies in redis!")
@@ -82,9 +81,6 @@ def create_cookies():
     print("Creating New Cookies!")
     with driver:
         driver.get(LOGIN_PAGE)
-        # print("Accept Cookie thing")
-        # elem = driver.find_element(By.XPATH, accept_button_xpath)
-        # elem.click()
         print("Fill Credentials")
         elem = driver.find_element(By.XPATH, USERNAME_XPATH)
         elem.send_keys(USERNAME)
@@ -122,23 +118,21 @@ def is_redis_available():
     """Check if redis is ready!"""
     try:
         r.memory_stats()
-    except (redis.exceptions.ConnectionError, redis.exceptions.BusyLoadingError):
+    except (redis.exceptions.ConnectionError, redis.exceptions.BusyLoadingError, redis.exceptions.TimeoutError):
         return False
     return True
 
 
-@app.route("/cookies")
-def get_cookies_json():
+@app.api_route("/cookies", response_class=ORJSONResponse)
+def get_cookies_json(response: Response):
     """Geneare payload of cookies in json format"""
     checks = do_checks()
-    if checks[0]:
-        cookies = get_cookies()
-        response = app.response_class(
-            response=json.dumps(cookies), status=200, mimetype="application/json"
-        )
+    if checks[0] == 0 :
+        message = get_cookies()
     else:
-        response = checks[1]
-    return response
+        message = checks[1]
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    return message
 
 
 def get_cookies():
@@ -150,22 +144,19 @@ def get_cookies():
     return cookies
 
 
-@app.route("/morning")
-def get_morning_url():
+@app.api_route("/morning", response_class=ORJSONResponse, status_code=200)
+async def get_morning_url(response: Response, force: Union[str, None] = None, fresh: Union[str, None] = None, newcookies: Union[str, None] = None):
     """Give back payload of our loved podcast!"""
-    force = request.args.get("force")
-    fresh = request.args.get("fresh")
-    newcookies = request.args.get("newcookies")
-    if force is not None:
-        newcookies = True
-        fresh = True
-
-    if newcookies is not None:
-        print("---> Forcing new Cookies")
-        create_cookies()
-
     checks = do_checks()
-    if checks[0]:
+    if checks[0] == 0:
+        print("Checks Ok")
+        if force is not None:
+            newcookies = True
+            fresh = True
+
+        if newcookies is not None:
+            print("---> Forcing new Cookies")
+            create_cookies()
         now = time.time()
         last_scrape = (
             0 if r.get("last_scrape") is None else pickle.loads(r.get("last_scrape"))
@@ -183,15 +174,16 @@ def get_morning_url():
         )
         morning = "Null" if r.get("morning") is None else pickle.loads(r.get("morning"))
 
-        response = jsonify(
-            morning=morning,
-            old_morning=old_morning,
-            last_scrape=last_scrape,
-            last_change=last_change,
-        )
+        response = {
+            "morning": morning,
+            "old_morning": old_morning,
+            "last_scrape": last_scrape,
+            "last_change": last_change,
+        }
     else:
-        response = checks[1]
-    return response
+        message = checks[1]
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    return message
 
 
 def update_morning_url():
@@ -223,25 +215,19 @@ def update_morning_url():
             r.set("morning", pickle.dumps(morning))
             r.set("last_change", pickle.dumps(last_scrape))
         r.set("last_scrape", pickle.dumps(last_scrape))
-        return jsonify(
-            morning=morning,
-            old_morning=old_morning,
-            last_scrape=last_scrape,
-            last_change=last_scrape,
-        )
+        response = {
+            "morning": morning,
+            "old_morning": old_morning,
+            "last_scrape": last_scrape,
+            "last_change": last_scrape,
+        }
+        return response
 
-
-@app.route("/")
-def main():
+@app.get("/", response_class=HTMLResponse, status_code=200)
+async def main():
     """Main Page"""
-    if not USERNAME or not PASSWORD:
-        response = app.response_class(
-            response="<p>Missing credentials!</p>", status=500
-        )
-    else:
-        response = app.response_class(response="<p>Hello</p>", status=200)
+    response = "<center><p>Go away sucker</p></center>"
     return response
-
 
 def do_checks():
     """Health Checks"""
@@ -252,34 +238,61 @@ def do_checks():
 
     print("Check Redis")
     redis_status = is_redis_available()
-
+    
+    exit_code=0
     if not selenium_status[0]:
         print("Selenium Failed")
-        response = app.response_class(
-            response="Connection to Selenium Failed", status=500
-        )
-        state = False
+        selenium_state="Connection to Selenium Failed"
+        selenium_state_code=500
+        exit_code=exit_code+1
+    else:
+        selenium_state="Ok"
+        selenium_state_code=200
+
     if not redis_status:
         print("Redis Failed")
-        response = app.response_class(response="Connection to Redis Failed", status=500)
-        state = False
-    elif not USERNAME or not PASSWORD:
+        redis_state = "Connection to Redis Failed"
+        redis_state_code=500
+        exit_code=exit_code+1
+    else:
+        redis_state = "Ok"
+        redis_state_code=200
+
+    if not USERNAME or not PASSWORD:
         print("Credentials Failed")
-        response = app.response_class(response="Missing credentials", status=500)
-        state = False
+        creds_state = "Missing credentials"
+        creds_state_code=500
+        exit_code=exit_code+1
     else:
-        response = app.response_class(response="ok", status=200)
-        state = True
+        creds_state = "ok"
+        creds_state_code=200
+
+    message = {
+        "selenium_state": selenium_state,
+        "selenium_state_code": selenium_state_code,
+        "redis_state ": redis_state ,
+        "redis_state_code": redis_state_code,
+        "creds_state ": creds_state ,
+        "creds_state_code": creds_state_code,
+    }
     print("Finished Checks")
-    return state, response
+    print(exit_code)
+    return exit_code, message
 
 
-@app.route("/ping")
-def ping():
+@app.get("/ping", response_class=PlainTextResponse, status_code=200)
+async def ping():
     """Pong"""
+    return "pong"
+
+@app.get("/status", response_class=ORJSONResponse, status_code=200)
+async def status_page(response: Response):
     checks = do_checks()
-    if checks[0]:
-        response = app.response_class(response="pong", status=200)
-    else:
-        response = checks[1]
-    return response
+    if checks[0] > 0: 
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    return checks[1]
+
+
+@app.api_route('/hello', response_class=PlainTextResponse, status_code=200)
+async def hello():
+    return "Hello World!"
