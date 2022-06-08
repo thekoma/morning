@@ -4,7 +4,6 @@ import orjson, json
 import os
 import pickle
 import time
-
 import redis
 import requests
 from dotenv import load_dotenv
@@ -164,9 +163,11 @@ async def get_morning_url(response: Response, force: Union[str, None] = None, fr
         if ((now - last_scrape) > CACHE_TIME) or fresh is not None:
             update_morning_url()
             last_scrape = pickle.loads(r.get("last_scrape"))
+
         last_change = (
             0 if r.get("last_change") is None else pickle.loads(r.get("last_change"))
         )
+
         old_morning = (
             "Null"
             if r.get("old_morning") is None
@@ -174,11 +175,20 @@ async def get_morning_url(response: Response, force: Union[str, None] = None, fr
         )
         morning = "Null" if r.get("morning") is None else pickle.loads(r.get("morning"))
 
+        last_change_human = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last_change))
+        last_scrape_human = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last_scrape))
+
         message = {
             "morning": morning,
             "old_morning": old_morning,
-            "last_scrape": last_scrape,
-            "last_change": last_change,
+            "last_scrape_info": {
+                "last_scrape": last_scrape,
+                "last_scrape_human_time": last_scrape_human
+            },
+            "last_change_info": {
+                "last_change": last_change,
+                "last_change_human_time": last_change_human
+            }
         }
     else:
         message = checks[1]
