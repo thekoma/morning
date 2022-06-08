@@ -8,7 +8,9 @@ ENV PYTHONFAULTHANDLER=1 \
     POETRY_VERSION=1.1.13
 WORKDIR /usr/src/app
 COPY poetry.lock pyproject.toml ./
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
+    DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 # hadolint ignore=DL3013
 RUN pip3 install --no-cache-dir --upgrade pip && \
     pip3 install --no-cache-dir poetry && \
