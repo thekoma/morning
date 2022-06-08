@@ -1,7 +1,7 @@
 ---
 services:
   morning:
-    build: .
+    image: ${TEST_IMAGE}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/ping"]
       interval: 5s
