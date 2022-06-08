@@ -2,12 +2,13 @@ FROM python:3-alpine
 # hadolint ignore=DL3018
 
 ENV PYTHONFAULTHANDLER=1 \
-  PYTHONUNBUFFERED=1 \
-  PYTHONHASHSEED=random \
-  PIP_NO_CACHE_DIR=off \
-  PIP_DISABLE_PIP_VERSION_CHECK=on \
-  PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.1.13
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_VERSION=1.1.13
+# hadolint ignore=DL3018
 # trunk-ignore(hadolint/DL3018)
 RUN apk add --no-cache build-base curl libffi-dev libxml2-dev libxslt-dev openssl-dev
 WORKDIR /usr/src/app
