@@ -238,42 +238,51 @@ def do_checks():
 
     print("Check Redis")
     redis_status = is_redis_available()
-    
+
     exit_code=0
+    ok_code=200
+    ko_code=500
+
     if not selenium_status[0]:
         print("Selenium Failed")
         selenium_state="Connection to Selenium Failed"
-        selenium_state_code=500
+        selenium_state_code=ko_code
         exit_code=exit_code+1
     else:
-        selenium_state="Ok"
-        selenium_state_code=200
+        selenium_state="ok"
+        selenium_state_code=ok_code
 
     if not redis_status:
         print("Redis Failed")
         redis_state = "Connection to Redis Failed"
-        redis_state_code=500
+        redis_state_code=ko_code
         exit_code=exit_code+1
     else:
-        redis_state = "Ok"
-        redis_state_code=200
+        redis_state = "ok"
+        redis_state_code=ok_code
 
     if not USERNAME or not PASSWORD:
         print("Credentials Failed")
         creds_state = "Missing credentials"
-        creds_state_code=500
+        creds_state_code=ko_code
         exit_code=exit_code+1
     else:
         creds_state = "ok"
-        creds_state_code=200
+        creds_state_code=ok_code
 
     message = {
-        "selenium_state": selenium_state,
-        "selenium_state_code": selenium_state_code,
-        "redis_state ": redis_state ,
-        "redis_state_code": redis_state_code,
-        "creds_state ": creds_state ,
-        "creds_state_code": creds_state_code,
+        "selenium": {
+            "state": selenium_state,
+            "state_code": selenium_state_code
+            },
+        "redis": {
+            "state ": redis_state,
+            "state_code": redis_state_code
+        },
+        "credentials": {
+            "state ": creds_state ,
+            "state_code": creds_state_code
+        }
     }
     print("Finished Checks")
     print(exit_code)
