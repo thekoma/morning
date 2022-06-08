@@ -83,4 +83,4 @@ jobs:
           tags: "${{ steps.ismain.outputs.value }}ghcr.io/${{ github.repository }}:${{ github.ref_name }}"
           cache-from: ${{ steps.bump.outputs.value }}
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
