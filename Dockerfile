@@ -20,4 +20,4 @@ COPY src/* .
 ENV FLASK_APP=morning
 ENV PYTHONUNBUFFERED=TRUE
 EXPOSE 5000
-CMD ["uvicorn", "morning:app", "--port", "5000", "--host", "0.0.0.0"]
+CMD ["uvicorn", "morning:app", "--proxy-headers", "--port", "5000", "--host", "0.0.0.0"]
