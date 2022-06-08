@@ -5,6 +5,8 @@ exit_var=1
 sleep=5
 
 echo 🐳 Setting up docker composer
+
+cp .env.dist .env
 docker-compose -f docker-compose.yml up -d
 
 echo "🚦 Starting checks."
