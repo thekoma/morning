@@ -174,7 +174,7 @@ async def get_morning_url(response: Response, force: Union[str, None] = None, fr
         )
         morning = "Null" if r.get("morning") is None else pickle.loads(r.get("morning"))
 
-        response = {
+        message = {
             "morning": morning,
             "old_morning": old_morning,
             "last_scrape": last_scrape,
