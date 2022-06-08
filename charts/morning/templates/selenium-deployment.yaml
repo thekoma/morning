@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: selenium
+  name: selenium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: selenium
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: selenium
+    spec:
+      containers:
+        - env:
+            - name: SE_NODE_MAX_SESSIONS
+              value: "100"
+            - name: USER_GID
+              value: "1000"
+            - name: USER_UID
+              value: "1000"
+            - name: VNC_NO_PASSWORD
+              value: "1"
+          image: selenium/standalone-chrome
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:4444/wd/hub/status
+            failureThreshold: 12
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: selenium
+          ports:
+            - containerPort: 4444
+          resources: {}
+      restartPolicy: Always
+status: {}

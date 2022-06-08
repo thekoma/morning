@@ -1,0 +1,8 @@
+name: charts/morning
+description: A generated Helm Chart for charts/morning from Skippbox Kompose
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - charts/morning
+sources:
+home:

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: morning
+  name: morning
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: morning
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: morning
+    spec:
+      containers:
+        - env:
+            - name: LOGIN_PASSWORD
+              value: password
+            - name: LOGIN_USER
+              value: fake
+            - name: USER_GID
+              value: "1000"
+            - name: USER_UID
+              value: "1000"
+          image: morning
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:5000/ping
+            failureThreshold: 12
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: morning
+          ports:
+            - containerPort: 5000
+          resources: {}
+      restartPolicy: Always
+status: {}
