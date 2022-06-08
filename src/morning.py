@@ -15,7 +15,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 
 load_dotenv()
-
+time.tzset()
 # Values from envirionment
 USERNAME = os.getenv("LOGIN_USER")
 PASSWORD = os.getenv("LOGIN_PASSWORD")
