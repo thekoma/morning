@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 0.9.3-beta
+  version: 0.13.0-beta
 lint:
   enabled:
     - actionlint@1.6.9
@@ -13,5 +13,4 @@ lint:
     - prettier@2.5.1
     - shellcheck@0.8.0
     - shfmt@3.4.0
-    - taplo-fmt@release-cli-0.6.0
     - taplo@release-cli-0.6.0
